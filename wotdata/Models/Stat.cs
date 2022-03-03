@@ -22,5 +22,11 @@ public class Stat
     public int Willpower { get; set; }
     public int Dexterity { get; set; }
     public int Constitution { get; set; }
-    public double Bmi => Math.Round((double)Weight / Height / Height * 10, 6);
+    public double Bmi
+    {
+        get
+        {
+            return Height > 0 ? Math.Round((double)Weight / Height / Height * 10, 6) : 0;
+        }        
+    }
 }
