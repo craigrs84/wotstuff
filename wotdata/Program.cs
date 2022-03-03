@@ -16,6 +16,7 @@ builder.Services.AddControllers().AddJsonOptions(options => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.AddServer(new Microsoft.OpenApi.Models.OpenApiServer { Url = basePath });
+    c.EnableAnnotations();
 });
 
 builder.Services.AddDbContext<AppDbContext>();
