@@ -24,7 +24,7 @@ public class EquipmentController : ControllerBase
     [HttpGet(Name = "GetEquipment")]
     public GetEquipmentResponse GetEquipment()
     {
-        var weapons = _db.Weapons.AsNoTracking().Adapt<List<WeaponDetail>>();
+        var weapons = _db.Weapons.AsNoTracking();
         var wearables = _db.Wearables.AsNoTracking();
 
         return new GetEquipmentResponse {

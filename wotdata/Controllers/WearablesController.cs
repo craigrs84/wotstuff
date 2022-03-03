@@ -22,16 +22,16 @@ public class WearablesController : ControllerBase
     }
 
     [HttpGet(Name = "GetWearables")]
-    public List<Wearable> GetWearables()
+    public IEnumerable<Wearable> GetWearables()
     {
-        var items = _db.Wearables.AsNoTracking().ToList();
+        var items = _db.Wearables.AsNoTracking();
         return items;
     }
 
     [HttpGet("csv", Name = "GetWearablesCsv")]
     public async Task GetWearablesCsv()
     {
-        var items = _db.Wearables.AsNoTracking().ToList();
+        var items = _db.Wearables.AsNoTracking();
 
         Response.StatusCode = 200;
         Response.ContentType = "text/csv";

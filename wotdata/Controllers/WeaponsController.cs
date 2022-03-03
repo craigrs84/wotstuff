@@ -22,16 +22,16 @@ public class WeaponsController : ControllerBase
     }
 
     [HttpGet(Name = "GetWeapons")]
-    public List<WeaponDetail> GetWeapons()
+    public IEnumerable<Weapon> GetWeapons()
     {
-        var items = _db.Weapons.AsNoTracking().Adapt<List<WeaponDetail>>();
+        var items = _db.Weapons.AsNoTracking();
         return items;
     }
 
     [HttpGet("csv", Name = "GetWeaponsCsv")]
     public async Task GetWeaponsCsv()
     {
-        var items = _db.Weapons.AsNoTracking().Adapt<List<WeaponDetail>>();
+        var items = _db.Weapons.AsNoTracking();
 
         Response.StatusCode = 200;
         Response.ContentType = "text/csv";

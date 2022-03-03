@@ -2,6 +2,7 @@
 using System.Globalization;
 using wotdata.Models;
 using CsvHelper;
+using Microsoft.EntityFrameworkCore;
 
 namespace data.Controllers;
 
@@ -20,14 +21,6 @@ public class StatsController : ControllerBase
         _dbContext = dbContext;
     }
 
-    [HttpPost]
-    public void Post(Stat stat)
-    {
-        stat.Id = 0;
-        _dbContext.Stats.Add(stat);
-        _dbContext.SaveChanges();
-    }
-
     [HttpGet]
     public IEnumerable<Stat> Get(string sex, string race, string @class, string homeland, int? level = 3)
     {
@@ -39,7 +32,7 @@ public class StatsController : ControllerBase
     [Route("csv")]
     public async Task GetCsv(string sex, string race, string @class, string homeland, int? level = 3)
     {
-        var stats = QueryStats(sex, race, @class, homeland, level);
+        var items = QueryStats(sex, race, @class, homeland, level);
 
         Response.StatusCode = 200;
         Response.ContentType = "text/csv";
@@ -48,10 +41,20 @@ public class StatsController : ControllerBase
         await using (var writer = new StreamWriter(Response.Body))
         await using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
-            await csv.WriteRecordsAsync(stats);
+            await csv.WriteRecordsAsync(items);
             await csv.FlushAsync();
         }
     }
+
+    [HttpPost]
+    public Stat Post(Stat model)
+    {
+        model.Id = 0;
+        _dbContext.Stats.Add(model);
+        _dbContext.SaveChanges();
+        return model;
+    }
+
 
     private IQueryable<Stat> QueryStats(string sex, string race, string @class, string homeland, int? level)
     {
@@ -60,7 +63,7 @@ public class StatsController : ControllerBase
         @class = @class?.Trim()?.ToLower();
         homeland = homeland?.Trim()?.ToLower();
 
-        var query = _dbContext.Stats.AsQueryable();
+        var query = _dbContext.Stats.AsNoTracking();
         if (!string.IsNullOrWhiteSpace(sex))
         {
             query = query.Where(x => x.Sex.ToLower() == sex);
