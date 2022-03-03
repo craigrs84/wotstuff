@@ -23,6 +23,7 @@ public class StatsController : ControllerBase
     [HttpPost]
     public void Post(Stat stat)
     {
+        stat.Id = 0;
         _dbContext.Stats.Add(stat);
         _dbContext.SaveChanges();
     }
