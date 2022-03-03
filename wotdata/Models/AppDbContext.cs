@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
 {
     public DbSet<Weapon> Weapons { get; set; }
     public DbSet<Wearable> Wearables { get; set; }
+    public DbSet<Stat> Stats { get; set; }
 
     public string DbPath { get; }
 
@@ -19,5 +20,6 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder) {
         builder.Entity<Weapon>().ToTable("Weapons");
         builder.Entity<Wearable>().ToTable("Wearables");
+        builder.Entity<Stat>().ToTable("Stats");
     }
 }

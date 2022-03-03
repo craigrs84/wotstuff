@@ -1,3 +1,5 @@
+using System.Globalization;
+using CsvHelper;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,73 +31,5 @@ public class EquipmentController : ControllerBase
             Weapons = weapons,
             Wearables = wearables
         };
-    }
-
-    [HttpPost("weapons", Name = "AddWeapon")]
-    public ActionResult<Weapon> UpdateWeapon(Weapon model)
-    {
-        model.Id = 0;
-        _db.Add(model);
-        _db.SaveChanges();
-        return model;
-    }
-
-    [HttpPut("weapons/{id}", Name = "UpdateWeapon")]
-    public ActionResult<Weapon> UpdateWeapon(int id, Weapon model)
-    {
-        model.Id = id;
-        if (_db.Weapons.AsNoTracking().Any(x => x.Id == id))
-        {
-            _db.Attach(model).State = EntityState.Modified;
-            _db.SaveChanges();
-            return model;
-        }
-
-        return NotFound();
-    }
-
-    [HttpDelete("weapons/{id}", Name = "DeleteWeapon")]
-    public void DeleteWeapon(int id)
-    {
-        var item = _db.Weapons.Find(id);
-        if (item != null)
-        {
-            _db.Weapons.Remove(item);
-            _db.SaveChanges();
-        }
-    }
-
-    [HttpPost("wearables", Name = "AddWearable")]
-    public ActionResult<Wearable> AddWearable(Wearable model)
-    {
-        model.Id = 0;
-        _db.Add(model);
-        _db.SaveChanges();
-        return model;
-    }
-
-    [HttpPut("wearables/{id}", Name = "UpdateWearable")]
-    public ActionResult<Wearable> UpdateWearable(int id, Wearable model)
-    {
-        model.Id = id;
-        if (!_db.Wearables.AsNoTracking().Any(x => x.Id == id))
-        {
-            _db.Attach(model).State = EntityState.Modified;
-            _db.SaveChanges();
-            return model;
-        }
-
-        return NotFound();
-    }
-
-    [HttpDelete("wearables/{id}", Name = "DeleteWearable")]
-    public void DeleteWearable(int id)
-    {
-        var item = _db.Wearables.Find(id);
-        if (item != null)
-        {
-            _db.Wearables.Remove(item);
-            _db.SaveChanges();
-        }
-    }
+    }    
 }
