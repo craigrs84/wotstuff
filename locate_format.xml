@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<TriggerPackage>
+		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="yes" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>locate_format:start</name>
+			<script>locate_format = locate_format or {}
+locate_format.matches = {}</script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>1</conditonLineDelta>
+			<mStayOpen>50</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList>
+				<string>Ok.</string>
+				<string>1</string>
+				<string>^(.+?) *- \[([a-z]{15})\] - somewhere (.+?)(?: of)? here(?:, (carried by an? .+?))?\.$</string>
+			</regexCodeList>
+			<regexCodePropertyList>
+				<integer>3</integer>
+				<integer>5</integer>
+				<integer>1</integer>
+			</regexCodePropertyList>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>locate_format:line</name>
+				<script>table.insert(locate_format.matches, matches)
+deleteLine()</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.+?) *- \[([a-z]{15})\] - somewhere (.+?)(?: of)? here(?:, (carried by an? .+?))?\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>locate_format:end</name>
+				<script>setTriggerStayOpen("locate_format:start", 0)
+
+local area_orders = {
+  "HERE", "E", "N", "NE", "NW", "S", "SE", "SW", "W",
+  "FE", "FN", "FNE", "FNW", "FS", "FSE", "FSW", "FW",
+  "VFE", "VFN", "VFNE", "VFNW", "VFS", "VFSE", "VFSW", "VFW",
+  "EFE", "EFN", "EFNE", "EFNW", "EFS", "EFSE", "EFSW", "EFW"
+}
+
+local carrier_colors = {
+  trolloc = "ansi_red",
+  myrddraal = "ansi_red",
+  dreadlord = "ansi_red",
+  grayman = "ansi_red",
+  draghkar = "ansi_red",
+  human = "ansi_cyan",
+  seanchan = "ansi_magenta",
+  ogier = "ansi_green",
+  aiel = "ansi_yellow",
+  ground = "saddle_brown"
+}
+
+-----------------------------------------------------------
+--CREATE MODELS
+-----------------------------------------------------------
+local models = {}
+for _, v in ipairs(locate_format.matches) do
+  local m = {}
+  
+  m.target = v[2]:gsub("^an? ", "")
+  m.code = v[3]
+  m.area = v[4]
+  m.carrier = v[5] or "on the ground"
+  m.carrier_short = m.carrier
+  m.carrier_short = m.carrier_short:gsub("carried by an? ", "")
+  m.carrier_short = m.carrier_short:gsub("on the ", "")
+  m.carrier_color = carrier_colors[m.carrier_short] or "reset"
+  m.area_short = m.area
+  m.area_short = m.area_short:gsub("extremely far ", "EF")
+  m.area_short = m.area_short:gsub("very far ", "VF")
+  m.area_short = m.area_short:gsub("far ", "F")
+  m.area_short = m.area_short:gsub("northeast", "NE")
+  m.area_short = m.area_short:gsub("northwest", "NW")
+  m.area_short = m.area_short:gsub("southeast", "SE")
+  m.area_short = m.area_short:gsub("southwest", "SW")
+  m.area_short = m.area_short:gsub("north", "N")
+  m.area_short = m.area_short:gsub("south", "S")
+  m.area_short = m.area_short:gsub("east", "E")
+  m.area_short = m.area_short:gsub("west", "W")
+  m.area_short = m.area_short:gsub("around", "HERE")  
+  m.area_order = table.index_of(area_orders, m.area_short)  
+  table.insert(models, m)
+end
+
+-----------------------------------------------------------
+--SORT MODELS
+-----------------------------------------------------------
+table.sort(models, function(a, b)
+  if a.area_order ~= b.area_order then
+    return b.area_order &lt; a.area_order
+  elseif a.carrier ~= b.carrier then
+    return b.carrier &lt; a.carrier
+  else
+    return a.target &lt; b.target
+  end
+end)
+
+-----------------------------------------------------------
+--PRINT HEADER
+-----------------------------------------------------------
+local header = "&lt;light_yellow&gt;"
+header = header .. string.format("%-40s", "TARGET")
+header = header .. string.format("%-19s", "TRAVEL")
+header = header .. string.format("%-8s", "AREA")
+header = header .. string.format("%s", "STATIONING")
+cecho(header .. "\n")
+
+-----------------------------------------------------------
+--ITERATE LINES
+-----------------------------------------------------------
+for _, m in ipairs(models) do
+  local text
+  
+  -----------------------------------------------------------
+  --TARGET
+  -----------------------------------------------------------
+  if m.target:len() &lt;= 40 - 4 then
+    text = string.format("%-40s", m.target)
+    cecho(text)
+  else
+    text = string.format("%-40s", m.target:sub(1, 40 - 4 - 3) .. "...")
+    cechoPopup(text, {[[]]}, {m.target}, true)
+  end
+  
+  -----------------------------------------------------------
+  --PORT CODE
+  -----------------------------------------------------------
+  text = string.format("&lt;honeydew&gt;%-19s", m.code)
+  cechoPopup(text, {
+    function()
+      send("channel 'travel' " .. m.code)
+    end,
+    function()
+      setClipboardText(m.code)
+    end
+  }, {"Travel", "Copy code"}, true)
+  
+  -----------------------------------------------------------
+  --AREA
+  -----------------------------------------------------------
+  text = string.format("&lt;powder_blue&gt;%-8s", m.area_short)
+  cecho(text)
+  
+  -----------------------------------------------------------
+  --CARRIER
+  -----------------------------------------------------------
+  text = string.format("&lt;%s&gt;%s", m.carrier_color, m.carrier)
+  cecho(text .. "\n")
+end
+
+-----------------------------------------------------------
+--PRINT FOOTER
+-----------------------------------------------------------
+local fparts = {}
+local footer = string.format("&lt;orange&gt;%s results", #models)
+cecho(footer .. "\n\n")
+
+--Fixes indent issue
+setWindowWrap(getWindowWrap())
+wrapLine("main", getLineCount())
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>$^</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</Trigger>
+	</TriggerPackage>
+</MudletPackage>
