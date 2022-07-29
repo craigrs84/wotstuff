@@ -765,6 +765,7 @@ int new_descriptor(int s)
    newd->snoop.snooping = 0;
    newd->snoop.snoop_by = 0;
    newd->login_time = time(0);
+   newd->use_eor = 0;
 
    if (++last_desc == 1000)
       last_desc = 1;
