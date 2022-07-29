@@ -816,6 +816,7 @@ struct descriptor_data {
    struct char_data *original;	/* original char if switched		*/
    struct snoop_data snoop;	/* to snoop people			*/
    struct descriptor_data *next; /* link to next descriptor		*/
+   int    use_eor;	/* use end of record */
 };
 
 struct msg_type {
