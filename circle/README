@@ -1,0 +1,52 @@
+
+Welcome to CircleMUD 2.0!
+
+Before doing anything else, please look at license.doc in the circle/doc
+directory.
+
+If you're like me, you don't like to read a lot of documentation when you
+have a neat new toy to play with.  In fact, if you've even read THIS far,
+I'm impressed!
+
+Briefly, here are a few tips on how to get started quickly:
+
+*  All source code is in the /src directory.  Type 'make' to compile only
+   the main Circle server; type 'make all' to make the server as well as
+   Circle's dozen or so maintenance utilities.
+
+*  The server should be run from Circle's root directory.  For debugging
+   and testing, you can just type 'bin/circle'; to run the game "for real,"
+   use the 'autorun' script -- it automatically reboots the game if it
+   crashes, and handles moving old system logs into the /log directory.
+   The game will run on port 4000 by default.
+
+*  The first character who logs in to the game will be made a level 34 god.
+   The first god can then use the 'advance' command to create other gods.
+   Use the 'wizhelp' command to get a list of god commands; use the
+   'commands' command to get a list of other commands.
+
+*  For security purposes (i.e., to prevent all hell from breaking loose
+   if someone hacks a god character), most of the god commands do not have
+   on-line documentation.  God commands are documented in the doc/wizhelp.doc
+   file.  Wizhelp.doc is in the standard help file format; if you're willing
+   to sacrifice security for convenience, you can incorporate the help for
+   the wizard commands into the on-line help file by copying wizhelp.doc into
+   lib/text/help_table.
+
+
+There is a wealth of additional information in the files in the /doc
+directory.  The README file in the /doc directory describes what is in
+each of the documentation files.  If you're just getting started, you
+may be interested in 'running.doc' -- it gives more detailed information
+about compiling, running, maintaining, and day-to-day administration of
+CircleMUD.
+
+If you have strange problems -- and you can't figure out the answer by
+reading the docs -- feel free to write me at the address below.
+
+Good luck, and have fun!
+
+Jeremy Elson
+aka Ras/Rasmussen
+jelson@circle.cs.jhu.edu
+July 16, 1993

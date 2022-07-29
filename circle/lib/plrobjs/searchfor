@@ -1,0 +1,5 @@
+../../bin/listrent a-e/* | fgrep -i $1
+../../bin/listrent f-j/* | fgrep -i $1
+../../bin/listrent k-o/* | fgrep -i $1
+../../bin/listrent p-t/* | fgrep -i $1
+../../bin/listrent u-z/* | fgrep -i $1

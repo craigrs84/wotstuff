@@ -1,0 +1,9 @@
+echo "Purging old rent files, please wait..."
+purgedir a-e
+purgedir f-j
+purgedir k-o
+purgedir p-t
+purgedir u-z
+rm -f zzz/*
+echo "Done."
+
