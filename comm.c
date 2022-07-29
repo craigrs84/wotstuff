@@ -34,6 +34,14 @@
 #define MAX_HOSTNAME 256
 #define OPT_USEC 250000 /* time delay corresponding to 4 passes/sec */
 
+#define IAC 255       /* interpret as command: */
+#define DONT 254      /* you are not to use option */
+#define DO 253        /* please, you use option */
+#define WONT 252      /* I won't use option */
+#define WILL 251      /* I will use option */
+#define EOR 239       /* end of record (transparent mode) */
+#define TELOPT_EOR 25 /* end or record */
+
 /* externs */
 extern int restricted;
 extern int mini_mud;
@@ -442,6 +450,12 @@ void game_loop(int s)
                   }
 
                   write_to_descriptor(point->descriptor, prompt);
+                  
+                  if (point->use_eor) {
+                     /* write telnet EOR */
+                     char eor_string[] = {(char)IAC, (char)EOR, (char)0};
+                     write_to_descriptor(point->descriptor, eor_string);
+                  }
                }
             }
             point->prompt_mode = 0;
@@ -763,6 +777,10 @@ int new_descriptor(int s)
    SEND_TO_Q(GREETINGS, newd);
    SEND_TO_Q("By what name do you wish to be known? ", newd);
 
+   /* write telent EOR option */
+   char eor_string[] = {(char)IAC, (char)WILL, (char)TELOPT_EOR, (char)0};
+   write_to_descriptor(newd->descriptor, eor_string);
+
    return (0);
 }
 
@@ -846,6 +864,38 @@ int process_input(struct descriptor_data *t)
    } while (!ISNEWL(*(t->buf + begin + sofar - 1)));
 
    *(t->buf + begin + sofar) = 0;
+
+   /* test for telnet options */
+   for (i = 0; *(t->buf + i) && i < MAX_INPUT_LENGTH - 3;)
+   {
+      int matched = 0;
+      if ((unsigned char)t->buf[i] == IAC &&
+          (unsigned char)t->buf[i + 1] == DO &&
+          (unsigned char)t->buf[i + 2] == TELOPT_EOR)
+      {
+         matched = 1;
+         t->use_eor = 1;
+      }
+      else if ((unsigned char)t->buf[i] == IAC &&
+               (unsigned char)t->buf[i + 1] == DONT &&
+               (unsigned char)t->buf[i + 2] == TELOPT_EOR)
+      {
+         matched = 1;
+         t->use_eor = 0;
+      }
+
+      if (matched)
+      {
+         /* squelch the entry from the buffer */
+         for (squelch = i;; squelch++)
+            if ((*(t->buf + squelch) = *(t->buf + squelch + 3)) == '\0')
+               break;
+      }
+      else
+      {
+         i++;
+      }
+   }
 
    /* if no newline is contained in input, return without proc'ing */
    for (i = begin; !ISNEWL(*(t->buf + i)); i++)
